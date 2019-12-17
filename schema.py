@@ -65,18 +65,3 @@ def remove_substrings(input):
                 result.remove(m)
 
     return result
-
-
-removed = remove_duplicates(['tv',
-                             'coffee machine',
-                             'kettle',
-                             'hair dryer',
-                             'iron',
-                             'Aircon',
-                             'Tv',
-                             'Coffee machine',
-                             'Kettle',
-                             'Hair dryer',
-                             'Iron',
-                             'Tub'])
-print(removed)

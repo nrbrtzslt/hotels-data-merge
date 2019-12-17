@@ -50,6 +50,7 @@ def transform_hotel_1(api_hotel):
 
 def transform_hotel_2(api_hotel):
     hotel_from_source_2 = []
+    image_list = list()
     for hotel in api_hotel:
         hotel_dictionary = get_hotel_dictionary()
         hotel_dictionary['id'] = hotel['hotel_id']
@@ -60,8 +61,16 @@ def transform_hotel_2(api_hotel):
         hotel_dictionary['description'] = hotel['details']
         hotel_dictionary['amenities']['general'] = hotel['amenities']['general']
         hotel_dictionary['amenities']['room'] = hotel['amenities']['room']
-        hotel_dictionary['images']['rooms'] = hotel['images']['rooms']
-        hotel_dictionary['images']['site'] = hotel['images']['site']
+        for link in hotel['images']['rooms']:
+            image_list.append({'link': link['link'], 'description': link['caption']})
+        hotel_dictionary['images']['rooms'] = image_list.copy()
+        image_list.clear()
+
+        for link in hotel['images']['site']:
+            image_list.append({'link': link['link'], 'description': link['caption']})
+        hotel_dictionary['images']['site'] = image_list.copy()
+        image_list.clear()
+
         hotel_dictionary['booking_conditions'] = hotel['booking_conditions']
         hotel_from_source_2.append(hotel_dictionary)
 
@@ -70,6 +79,7 @@ def transform_hotel_2(api_hotel):
 
 def transform_hotel_3(api_hotel):
     hotel_from_source_3 = []
+    image_list = list()
     for hotel in api_hotel:
         hotel_dictionary = get_hotel_dictionary()
         hotel_dictionary['id'] = hotel['id']
@@ -80,8 +90,16 @@ def transform_hotel_3(api_hotel):
         hotel_dictionary['location']['address'] = hotel['address']
         hotel_dictionary['description'] = hotel['info']
         hotel_dictionary['amenities']['room'] = hotel['amenities']
-        hotel_dictionary['images']['rooms'] = hotel['images']['rooms']
-        hotel_dictionary['images']['amenities'] = hotel['images']['amenities']
+        for link in hotel['images']['rooms']:
+            image_list.append({'link': link['url'], 'description': link['description']})
+        hotel_dictionary['images']['rooms'] = image_list.copy()
+        image_list.clear()
+
+        for link in hotel['images']['amenities']:
+            image_list.append({'link': link['url'], 'description': link['description']})
+        hotel_dictionary['images']['amenities'] = image_list.copy()
+        image_list.clear()
+
         hotel_from_source_3.append(hotel_dictionary)
 
     return hotel_from_source_3
