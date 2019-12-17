@@ -42,7 +42,7 @@ def transform_hotel_1(api_hotel):
         hotel_dictionary['location']['city'] = hotel['City']
         hotel_dictionary['location']['country'] = hotel['Country']
         hotel_dictionary['description'] = hotel['Description']
-        hotel_dictionary['amenities']['room'] = hotel['Facilities']
+        hotel_dictionary['amenities']['general'] = hotel['Facilities']
         hotel_from_source_1.append(hotel_dictionary)
 
     return hotel_from_source_1
@@ -90,3 +90,9 @@ def transform_hotel_3(api_hotel):
 hotel_from_a = transform_hotel_1(json.loads(requests.get("https://api.myjson.com/bins/gdmqa").text))
 hotel_from_b = transform_hotel_2(json.loads(requests.get("https://api.myjson.com/bins/1fva3m").text))
 hotel_from_c = transform_hotel_3(json.loads(requests.get("https://api.myjson.com/bins/j6kzm").text))
+
+all_sources = []
+all_sources.append(hotel_from_a)
+all_sources.append(hotel_from_b)
+all_sources.append(hotel_from_c)
+
