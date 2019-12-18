@@ -7,6 +7,11 @@ import sanitizer
 result = {}
 
 
+def merge_json(base, head, merger_schema):
+    merger = jsonmerge.Merger(merger_schema)
+    return merger.merge(base, head)
+
+
 def recursive_merge(source, target, sub_schema, structure_key):
     global result
     structure_schema = schema.get_schema_with_strategies(source.copy(), target.copy(), sub_schema)
@@ -19,21 +24,6 @@ def recursive_merge(source, target, sub_schema, structure_key):
     for key, value in source.items():
         if isinstance(value, dict):
             recursive_merge(source[key], target[key], schema.key_dictionary[key], key)
-
-
-def sanitize_merged_hotels(merged_hotels):
-    for hotel in merged_hotels:
-        # Deal with duplicated list items
-        hotel['amenities']['general'] = sanitizer.remove_duplicates(hotel['amenities']['general'])
-        hotel['amenities']['room'] = sanitizer.remove_duplicates(hotel['amenities']['room'])
-        # Deal with duplicated urls
-        set_of_json = {json.dumps(d) for d in hotel['images']['rooms']}
-        hotel['images']['rooms'] = [json.loads(t) for t in set_of_json]
-
-
-def merge_json(base, head, merger_schema):
-    merger = jsonmerge.Merger(merger_schema)
-    return merger.merge(base, head)
 
 
 def merge_sources(source1, source2):
@@ -50,6 +40,16 @@ def merge_sources(source1, source2):
             merged_hotels.append(hotel_a)
 
     return merged_hotels
+
+
+def sanitize_merged_hotels(merged_hotels):
+    for hotel in merged_hotels:
+        # Deal with duplicated list items
+        hotel['amenities']['general'] = sanitizer.remove_duplicates(hotel['amenities']['general'])
+        hotel['amenities']['room'] = sanitizer.remove_duplicates(hotel['amenities']['room'])
+        # Deal with duplicated urls
+        set_of_json = {json.dumps(d) for d in hotel['images']['rooms']}
+        hotel['images']['rooms'] = [json.loads(t) for t in set_of_json]
 
 
 def get_dict_for_web_api():
