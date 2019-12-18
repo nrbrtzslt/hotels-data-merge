@@ -1,5 +1,4 @@
 import json
-
 import requests
 
 
@@ -105,12 +104,8 @@ def transform_hotel_3(api_hotel):
     return hotel_from_source_3
 
 
-hotel_from_a = transform_hotel_1(json.loads(requests.get("https://api.myjson.com/bins/gdmqa").text))
-hotel_from_b = transform_hotel_2(json.loads(requests.get("https://api.myjson.com/bins/1fva3m").text))
-hotel_from_c = transform_hotel_3(json.loads(requests.get("https://api.myjson.com/bins/j6kzm").text))
-
-all_sources = []
-all_sources.append(hotel_from_a)
-all_sources.append(hotel_from_b)
-all_sources.append(hotel_from_c)
-
+def get_hotels_from_api():
+    all_sources = [transform_hotel_1(json.loads(requests.get("https://api.myjson.com/bins/gdmqa").text)),
+                   transform_hotel_2(json.loads(requests.get("https://api.myjson.com/bins/1fva3m").text)),
+                   transform_hotel_3(json.loads(requests.get("https://api.myjson.com/bins/j6kzm").text))]
+    return all_sources
