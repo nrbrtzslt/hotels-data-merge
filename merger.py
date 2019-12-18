@@ -2,7 +2,6 @@ import hotels
 import schema
 import jsonmerge
 import json
-from pprint import pprint
 
 result = {}
 
@@ -55,5 +54,5 @@ for i in range(1, len(hotels.all_sources)):
     merged_sources = merge_sources(merged_sources, hotels.all_sources[i])
 sanitize_merged_hotels(merged_sources)
 
-for merged_hotel in merged_sources:
-    pprint(merged_hotel, width=150, sort_dicts=False)
+# for merged_hotel in merged_sources:
+#     pprint(merged_hotel, width=150, sort_dicts=False)
