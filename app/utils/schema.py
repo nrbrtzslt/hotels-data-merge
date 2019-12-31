@@ -13,7 +13,7 @@ def get_schema_with_strategies(source, target, json_keys):
             schema['properties'][key] = {"mergeStrategy": "overwrite"}
         elif target[key] == "" or target[key] is None:
             schema['properties'][key] = {"mergeStrategy": "discard"}
-        elif isinstance(source[key], list):
+        elif isinstance(source[key], list) or isinstance(target[key], list):
             schema['properties'][key] = {"mergeStrategy": "append"}
         elif source[key] < target[key]:
             schema['properties'][key] = {"mergeStrategy": "overwrite"}

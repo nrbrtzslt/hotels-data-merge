@@ -1,5 +1,5 @@
 import hotels
-import schema
+from app.utils import schema
 import jsonmerge
 import json
 from app.utils.sanitizer import Sanitizer
