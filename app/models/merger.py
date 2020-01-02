@@ -1,64 +1,65 @@
-import hotels
-from app.utils import schema
-import jsonmerge
 import json
+
+from jsonmerge import Merger
+
+from app.utils import schema
 from app.utils.sanitizer import Sanitizer
-
-result = {}
-
-
-def merge_json(base, head, merger_schema):
-    merger = jsonmerge.Merger(merger_schema)
-    return merger.merge(base, head)
+from hotels import get_hotels_from_api
 
 
-def recursive_merge(source, target, sub_schema, structure_key):
-    global result
-    structure_schema = schema.get_schema_with_strategies(source.copy(), target.copy(), sub_schema)
+class HotelMerger:
+    def __init__(self):
+        self._hotels = get_hotels_from_api()
+        self._result = dict()
 
-    if not structure_key:
-        result = merge_json(source, target, structure_schema)
-    else:
-        result[structure_key] = merge_json(source, target, structure_schema)
+    @staticmethod
+    def merge_json(base, head, merger_schema):
+        merger = Merger(merger_schema)
+        return merger.merge(base, head)
 
-    for key, value in source.items():
-        if isinstance(value, dict):
-            recursive_merge(source[key], target[key], schema.key_dictionary[key], key)
+    def recursive_merge(self, source, target, sub_schema, structure_key):
+        structure_schema = schema.get_schema_with_strategies(source.copy(), target.copy(), sub_schema)
 
+        if not structure_key:
+            self._result = HotelMerger.merge_json(source, target, structure_schema)
+        else:
+            self._result[structure_key] = HotelMerger.merge_json(source, target, structure_schema)
 
-def merge_sources(source1, source2):
-    merged_hotels = []
-    for hotel_a in source1:
-        can_merge = False
-        for hotel_b in source2:
-            if hotel_a['id'] == hotel_b['id']:
-                recursive_merge(hotel_a.copy(), hotel_b.copy(), schema.key_dictionary['general'], '')
-                merged_hotels.append(result)
-                can_merge = True
+        for key, value in source.items():
+            if isinstance(value, dict):
+                self.recursive_merge(source[key], target[key], schema.key_dictionary[key], key)
 
-        if not can_merge:
-            merged_hotels.append(hotel_a)
+    def merge_sources(self, source1, source2):
+        merged_hotels = []
+        for hotel_a in source1:
+            can_merge = False
+            for hotel_b in source2:
+                if hotel_a['id'] == hotel_b['id']:
+                    self.recursive_merge(hotel_a.copy(), hotel_b.copy(), schema.key_dictionary['general'], '')
+                    merged_hotels.append(self._result)
+                    can_merge = True
 
-    return merged_hotels
+            if not can_merge:
+                merged_hotels.append(hotel_a)
 
+        return merged_hotels
 
-def sanitize_merged_hotels(merged_hotels):
-    for hotel in merged_hotels:
-        # Deal with duplicated list items
-        hotel['amenities']['general'] = Sanitizer.remove_duplicates(hotel['amenities']['general'])
-        hotel['amenities']['room'] = Sanitizer.remove_duplicates(hotel['amenities']['room'])
-        # Deal with duplicated urls
-        set_of_json = {json.dumps(d) for d in hotel['images']['rooms']}
-        hotel['images']['rooms'] = [json.loads(t) for t in set_of_json]
+    @classmethod
+    def sanitize_merged_hotels(cls, merged_hotels):
+        for hotel in merged_hotels:
+            # Deal with duplicated list items
+            hotel['amenities']['general'] = Sanitizer.remove_duplicates(hotel['amenities']['general'])
+            hotel['amenities']['room'] = Sanitizer.remove_duplicates(hotel['amenities']['room'])
+            # Deal with duplicated urls
+            set_of_json = {json.dumps(d) for d in hotel['images']['rooms']}
+            hotel['images']['rooms'] = [json.loads(t) for t in set_of_json]
 
+    def merge(self):
+        merged_sources = self._hotels[0]
 
-def get_dict_for_web_api():
-    all_sources = hotels.get_hotels_from_api()
-    merged_sources = all_sources[0]
+        for i in range(1, len(self._hotels)):
+            merged_sources = self.merge_sources(merged_sources, self._hotels[i])
 
-    for i in range(1, len(all_sources)):
-        merged_sources = merge_sources(merged_sources, all_sources[i])
+        HotelMerger.sanitize_merged_hotels(merged_sources)
 
-    sanitize_merged_hotels(merged_sources)
-
-    return merged_sources
+        return merged_sources
