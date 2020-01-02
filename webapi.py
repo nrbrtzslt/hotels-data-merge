@@ -1,5 +1,5 @@
 from flask import Flask, request
-import merger
+from app.models import merger
 import json
 
 app = Flask("hotels-data-merge")

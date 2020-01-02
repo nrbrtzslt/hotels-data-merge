@@ -16,7 +16,7 @@ class Sanitizer:
         result = list(set(result))
         result = Sanitizer.remove_substrings(result)
 
-        return result
+        return sorted(result)
 
     @staticmethod
     def split_camel_case(camel_cased_word):
