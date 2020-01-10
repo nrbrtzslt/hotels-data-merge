@@ -1,5 +1,6 @@
 import json
 import requests
+import asyncio
 
 
 def get_hotel_dictionary():
@@ -28,7 +29,8 @@ def get_hotel_dictionary():
     }
 
 
-def transform_hotel_1(api_hotel):
+def transform_hotel_1():
+    api_hotel = json.loads(requests.get("https://api.myjson.com/bins/gdmqa").text)
     hotel_from_source_1 = []
     for hotel in api_hotel:
         hotel_dictionary = get_hotel_dictionary()
@@ -47,7 +49,8 @@ def transform_hotel_1(api_hotel):
     return hotel_from_source_1
 
 
-def transform_hotel_2(api_hotel):
+def transform_hotel_2():
+    api_hotel = json.loads(requests.get("https://api.myjson.com/bins/1fva3m").text)
     hotel_from_source_2 = []
     image_list = list()
     for hotel in api_hotel:
@@ -76,7 +79,8 @@ def transform_hotel_2(api_hotel):
     return hotel_from_source_2
 
 
-def transform_hotel_3(api_hotel):
+def transform_hotel_3():
+    api_hotel = json.loads(requests.get("https://api.myjson.com/bins/j6kzm").text)
     hotel_from_source_3 = []
     image_list = list()
     for hotel in api_hotel:
@@ -104,8 +108,38 @@ def transform_hotel_3(api_hotel):
     return hotel_from_source_3
 
 
-def get_hotels_from_api():
-    all_sources = [transform_hotel_1(json.loads(requests.get("https://api.myjson.com/bins/gdmqa").text)),
-                   transform_hotel_2(json.loads(requests.get("https://api.myjson.com/bins/1fva3m").text)),
-                   transform_hotel_3(json.loads(requests.get("https://api.myjson.com/bins/j6kzm").text))]
-    return all_sources
+async def get_hotels_from_api():
+    loop = asyncio.get_event_loop()
+    future1 = loop.run_in_executor(None, transform_hotel_1)
+    future2 = loop.run_in_executor(None, transform_hotel_2)
+    future3 = loop.run_in_executor(None, transform_hotel_3)
+    response1 = await future1
+    response2 = await future2
+    response3 = await future3
+
+    return [response1, response2, response3]
+
+
+# def get_api():
+#     api_urls = ["https://api.myjson.com/bins/j6kzm",
+#                "https://api.myjson.com/bins/1fva3m",
+#                "https://api.myjson.com/bins/gdmqa"]
+#
+#     result = []
+#
+#     for url in api_urls:
+#         result.append(json.loads(requests.get(url).text))
+#
+#     return result
+#
+#
+# async def get_api_with_async():
+#     loop = asyncio.get_event_loop()
+#     future1 = loop.run_in_executor(None, requests.get, "https://api.myjson.com/bins/j6kzm")
+#     future2 = loop.run_in_executor(None, requests.get, "https://api.myjson.com/bins/1fva3m")
+#     future3 = loop.run_in_executor(None, requests.get, "https://api.myjson.com/bins/gdmqa")
+#     response1 = await future1
+#     response2 = await future2
+#     response3 = await future3
+#
+#     return [response1.text, response2.text, response3.text]

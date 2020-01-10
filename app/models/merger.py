@@ -4,12 +4,11 @@ from jsonmerge import Merger
 
 from app.utils import schema
 from app.utils.sanitizer import Sanitizer
-from hotels import get_hotels_from_api
 
 
 class HotelMerger:
-    def __init__(self):
-        self._hotels = get_hotels_from_api()
+    def __init__(self, hotels):
+        self._hotels = hotels
         self._result = dict()
 
     @staticmethod

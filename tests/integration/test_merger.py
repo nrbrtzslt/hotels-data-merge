@@ -1,5 +1,4 @@
 from app.models.merger import HotelMerger
-import hotels
 import json
 
 
@@ -17,9 +16,9 @@ def test_merge_hotels(monkeypatch):
         with open('tests/integration/mock_data_source_1') as mock_data:
             return json.loads(mock_data.read())
 
-    monkeypatch.setattr(hotels, 'get_hotels_from_api', mock_hotel_sources)
+    # monkeypatch.setattr(hotels, 'get_hotels_from_api', mock_hotel_sources)
 
-    hotel_merger = HotelMerger()
+    hotel_merger = HotelMerger(mock_hotel_sources())
 
     result = hotel_merger.merge()
 
